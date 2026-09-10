@@ -1,0 +1,406 @@
+@import 'tailwindcss';
+
+/* ==========================================================================
+   ExpenseX design system
+   --------------------------------------------------------------------------
+   Every colour, radius, border and motion value in the product resolves to a
+   token declared here. Components never hardcode a hex value.
+
+   The palette is a muted sage ground with deep olive typography, one yellow
+   accent for "allocate / plan" surfaces and one coral for "over budget"
+   warnings. Dark mode is a separately authored palette, not an inversion:
+   the olive identity, the yellow and the coral all survive the switch.
+   ========================================================================== */
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+:root {
+  color-scheme: light;
+
+  /* --- Ground & panels --------------------------------------------------- */
+  --ex-canvas: #adb3a1; /* app background, visible as gutters between panels */
+  --ex-surface: #c8ccba; /* primary panel */
+  --ex-surface-2: #d3d7c6; /* raised panel / hover */
+  --ex-surface-3: #dee1d2; /* input wells, table zebra */
+  --ex-surface-sunken: #a2a996;
+
+  /* --- Dark olive blocks ------------------------------------------------- */
+  --ex-forest: #3d4739;
+  --ex-forest-2: #2c3429;
+  --ex-on-forest: #dfe3d3;
+  --ex-on-forest-muted: #9ba48f;
+
+  /* --- Typography -------------------------------------------------------- */
+  --ex-ink: #161c15; /* primary text */
+  --ex-ink-2: #333b2e; /* secondary text */
+  --ex-ink-3: #4a5243; /* muted text — holds 4.9:1 on --ex-surface */
+  --ex-ink-faint: #7a8372; /* decorative only: hatching, trailing decimals */
+
+  /* --- Accents ----------------------------------------------------------- */
+  --ex-accent: #e3ce4c; /* yellow: budgeting / allocation surfaces */
+  --ex-accent-strong: #d4bd35;
+  --ex-on-accent: #2a2708; /* 9.5:1 on --ex-accent */
+
+  --ex-coral: #e56c4c; /* coral: overrun / destructive */
+  --ex-coral-strong: #d4573a;
+  --ex-on-coral: #23150f; /* 5.3:1 on --ex-coral */
+
+  --ex-positive: #46614a; /* income / gains — never the only signal */
+  --ex-on-positive: #e6ebdd;
+
+  /* --- Lines ------------------------------------------------------------- */
+  --ex-line: color-mix(in srgb, var(--ex-ink) 18%, transparent);
+  --ex-line-strong: color-mix(in srgb, var(--ex-ink) 34%, transparent);
+  --ex-line-faint: color-mix(in srgb, var(--ex-ink) 9%, transparent);
+  --ex-line-on-forest: color-mix(in srgb, var(--ex-on-forest) 22%, transparent);
+
+  --ex-focus: #1d2a4d;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --ex-canvas: #0e120d;
+  --ex-surface: #161b14;
+  --ex-surface-2: #1e251b;
+  --ex-surface-3: #262e22;
+  --ex-surface-sunken: #0a0d09;
+
+  --ex-forest: #2f3a2b;
+  --ex-forest-2: #3a4635;
+  --ex-on-forest: #dfe3d3;
+  --ex-on-forest-muted: #9ba48f;
+
+  --ex-ink: #e2e7d6;
+  --ex-ink-2: #c2c9b4;
+  --ex-ink-3: #98a18b; /* 6.5:1 on --ex-surface */
+  --ex-ink-faint: #6e7767;
+
+  --ex-accent: #e8d75e;
+  --ex-accent-strong: #f0e075;
+  --ex-on-accent: #22200a;
+
+  --ex-coral: #f07e5e;
+  --ex-coral-strong: #f79376;
+  --ex-on-coral: #2b120a;
+
+  --ex-positive: #8fb894;
+  --ex-on-positive: #12200f;
+
+  --ex-line: color-mix(in srgb, var(--ex-ink) 16%, transparent);
+  --ex-line-strong: color-mix(in srgb, var(--ex-ink) 30%, transparent);
+  --ex-line-faint: color-mix(in srgb, var(--ex-ink) 8%, transparent);
+  --ex-line-on-forest: color-mix(in srgb, var(--ex-on-forest) 20%, transparent);
+
+  --ex-focus: #b9c8ff;
+}
+
+/* --------------------------------------------------------------------------
+   Expose tokens to Tailwind. `inline` keeps them as var() references so the
+   dark palette swaps at runtime without duplicating every utility.
+   -------------------------------------------------------------------------- */
+@theme inline {
+  --color-canvas: var(--ex-canvas);
+  --color-surface: var(--ex-surface);
+  --color-surface-2: var(--ex-surface-2);
+  --color-surface-3: var(--ex-surface-3);
+  --color-sunken: var(--ex-surface-sunken);
+
+  --color-forest: var(--ex-forest);
+  --color-forest-2: var(--ex-forest-2);
+  --color-on-forest: var(--ex-on-forest);
+  --color-on-forest-muted: var(--ex-on-forest-muted);
+
+  --color-ink: var(--ex-ink);
+  --color-ink-2: var(--ex-ink-2);
+  --color-ink-3: var(--ex-ink-3);
+  --color-ink-faint: var(--ex-ink-faint);
+
+  --color-accent: var(--ex-accent);
+  --color-accent-strong: var(--ex-accent-strong);
+  --color-on-accent: var(--ex-on-accent);
+
+  --color-coral: var(--ex-coral);
+  --color-coral-strong: var(--ex-coral-strong);
+  --color-on-coral: var(--ex-on-coral);
+
+  --color-positive: var(--ex-positive);
+  --color-on-positive: var(--ex-on-positive);
+
+  --color-line: var(--ex-line);
+  --color-line-strong: var(--ex-line-strong);
+  --color-line-faint: var(--ex-line-faint);
+  --color-line-on-forest: var(--ex-line-on-forest);
+  --color-focus: var(--ex-focus);
+
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, 'SFMono-Regular', 'Cascadia Mono', monospace;
+
+  --radius-block: 3px;
+  --radius-tile: 10px;
+  --radius-panel: 22px;
+  --radius-shell: 30px;
+
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+
+  --breakpoint-xs: 26rem;
+}
+
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
+@layer base {
+  * {
+    border-color: var(--ex-line);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scrollbar-color: var(--ex-ink-faint) transparent;
+  }
+
+  body {
+    background: var(--ex-canvas);
+    color: var(--ex-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: 'ss01', 'cv05';
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* One visible, high-contrast focus ring everywhere. */
+  :focus-visible {
+    outline: 2px solid var(--ex-focus);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: var(--ex-accent);
+    color: var(--ex-on-accent);
+  }
+
+  /* Numerals are always tabular so columns of money align. */
+  input[type='number'] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--ex-line-strong);
+    border-radius: 999px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Signature motifs — lifted from the reference art direction
+   -------------------------------------------------------------------------- */
+@layer components {
+  /* Micro uppercase metadata label: TOTAL SPENT, AVAILABLE, PAID BY … */
+  .ex-label {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    line-height: 1;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ex-ink-3);
+  }
+
+  .ex-label-lg {
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+  }
+
+  /* Oversized financial figures. Tight, technical, tabular. */
+  .ex-numeral {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    font-feature-settings: 'zero' 1;
+  }
+
+  /* Thin vertical rule hatching used as texture and as bar-chart fill. */
+  .ex-hatch {
+    background-image: repeating-linear-gradient(
+      90deg,
+      var(--ex-line-strong) 0,
+      var(--ex-line-strong) 1px,
+      transparent 1px,
+      transparent 6px
+    );
+  }
+
+  .ex-hatch-dense {
+    background-image: repeating-linear-gradient(
+      90deg,
+      var(--ex-line-strong) 0,
+      var(--ex-line-strong) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+  }
+
+  .ex-hatch-on-dark {
+    background-image: repeating-linear-gradient(
+      90deg,
+      var(--ex-line-on-forest) 0,
+      var(--ex-line-on-forest) 1px,
+      transparent 1px,
+      transparent 6px
+    );
+  }
+
+  /* The large rounded container the whole app sits inside. */
+  .ex-panel {
+    background: var(--ex-surface);
+    border-radius: var(--radius-panel);
+  }
+
+  /* Full-bleed stacked colour block — the core layout unit, not a card. */
+  .ex-block {
+    position: relative;
+    display: block;
+    width: 100%;
+    text-align: left;
+  }
+}
+
+@layer utilities {
+  .ex-tnum {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Hide scrollbars on horizontal filter rails without losing scrollability. */
+  .ex-no-scrollbar {
+    scrollbar-width: none;
+  }
+  .ex-no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ex-grid-dots {
+    background-image: radial-gradient(currentColor 1px, transparent 1px);
+    background-size: 5px 5px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Motion — subtle, and fully surrendered under prefers-reduced-motion
+   -------------------------------------------------------------------------- */
+@keyframes ex-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ex-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ex-sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes ex-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ex-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes ex-draw {
+  from {
+    stroke-dashoffset: var(--ex-draw-length, 1000);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.ex-animate-rise {
+  animation: ex-rise 0.42s var(--ease-out-quint) both;
+}
+.ex-animate-fade {
+  animation: ex-fade 0.25s ease both;
+}
+.ex-animate-sheet {
+  animation: ex-sheet-up 0.32s var(--ease-out-quint) both;
+}
+.ex-animate-scale {
+  animation: ex-scale-in 0.22s var(--ease-out-quint) both;
+}
+
+.ex-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--ex-line-faint) 25%,
+    var(--ex-line) 50%,
+    var(--ex-line-faint) 75%
+  );
+  background-size: 200% 100%;
+  animation: ex-shimmer 1.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  .ex-no-print {
+    display: none !important;
+  }
+}

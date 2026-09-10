@@ -1,0 +1,520 @@
+// ExpenseX — personal + two-person collaborative finance.
+//
+// MONEY PRECISION
+// ---------------
+// Every monetary column is an Int holding **minor units** (paise for INR,
+// cents for USD). No column is ever a float/double. This makes arithmetic
+// exact end-to-end: the database, the server and the client all move whole
+// integers around, and formatting to "₹1,894.00" happens only at the edge.
+// See src/lib/money.ts.
+//
+// PERSONAL vs SHARED SCOPE
+// ------------------------
+// Scoped entities (Transaction, Budget, Goal, RecurringTransaction) carry both
+// `userId` and `workspaceId`:
+//
+//   personal → workspaceId = NULL, userId = owner
+//   shared   → workspaceId = <workspace>, userId = creator
+//
+// `scopeKey` is a denormalised, NOT NULL discriminator ("u:<id>" / "w:<id>").
+// It exists because PostgreSQL treats NULLs as distinct in unique indexes, so
+// UNIQUE(userId, workspaceId, year, month) would NOT stop a user creating two
+// personal budgets for the same month. Uniqueness is enforced on scopeKey
+// instead. A CHECK constraint in the initial migration enforces that exactly
+// one of userId/workspaceId is set, and that scopeKey matches it.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum TransactionType {
+  EXPENSE
+  INCOME
+  TRANSFER
+}
+
+enum PaymentMethod {
+  CASH
+  UPI
+  DEBIT_CARD
+  CREDIT_CARD
+  BANK_TRANSFER
+  OTHER
+}
+
+enum AccountType {
+  CASH
+  BANK
+  WALLET
+  CREDIT_CARD
+  SAVINGS
+}
+
+enum CategoryKind {
+  EXPENSE
+  INCOME
+  BOTH
+}
+
+enum WorkspaceRole {
+  OWNER
+  MEMBER
+}
+
+enum MemberStatus {
+  ACTIVE
+  REMOVED
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  EXPIRED
+  REVOKED
+}
+
+enum RecurrenceFrequency {
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
+
+enum ActivityAction {
+  WORKSPACE_CREATED
+  WORKSPACE_SETTINGS_UPDATED
+  MEMBER_INVITED
+  MEMBER_JOINED
+  MEMBER_REMOVED
+  MEMBER_LEFT
+  INVITATION_DECLINED
+  TRANSACTION_CREATED
+  TRANSACTION_UPDATED
+  TRANSACTION_DELETED
+  BUDGET_CREATED
+  BUDGET_UPDATED
+  BUDGET_EXCEEDED
+  GOAL_CREATED
+  GOAL_UPDATED
+  GOAL_DELETED
+  GOAL_CONTRIBUTION_ADDED
+}
+
+enum NotificationType {
+  SHARED_TRANSACTION
+  SHARED_BUDGET_CHANGED
+  SHARED_BUDGET_EXCEEDED
+  SHARED_GOAL_CONTRIBUTION
+  SHARED_GOAL_CREATED
+  WORKSPACE_INVITATION
+  WORKSPACE_MEMBERSHIP
+}
+
+// ---------------------------------------------------------------------------
+// Identity
+// ---------------------------------------------------------------------------
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  avatarUrl    String?
+  currency     String   @default("INR")
+  theme        String   @default("system") // light | dark | system
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sessions             Session[]
+  ownedWorkspaces      Workspace[]           @relation("WorkspaceOwner")
+  memberships          WorkspaceMember[]
+  sentInvitations      Invitation[]          @relation("InvitationSender")
+  accounts             Account[]
+  categories           Category[]
+  tags                 Tag[]
+  transactions         Transaction[]         @relation("TransactionCreator")
+  paidTransactions     Transaction[]         @relation("TransactionPayer")
+  budgets              Budget[]
+  goals                Goal[]
+  goalContributions    GoalContribution[]
+  recurring            RecurringTransaction[]
+  activities           Activity[]            @relation("ActivityActor")
+  notifications        Notification[]
+  notificationPrefs    NotificationPreference?
+
+  @@index([email])
+}
+
+/// Server-side session store. Only a SHA-256 hash of the opaque session token
+/// is persisted, so a database leak does not hand out live sessions.
+model Session {
+  id         String   @id @default(cuid())
+  tokenHash  String   @unique
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userAgent  String?
+  ipHash     String?
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  lastSeenAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+// ---------------------------------------------------------------------------
+// Shared workspaces
+// ---------------------------------------------------------------------------
+
+model Workspace {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  currency    String   @default("INR")
+  /// UX is designed for exactly two people; the schema allows raising this.
+  memberLimit Int      @default(2)
+  ownerId     String
+  owner       User     @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members       WorkspaceMember[]
+  invitations   Invitation[]
+  transactions  Transaction[]
+  budgets       Budget[]
+  goals         Goal[]
+  recurring     RecurringTransaction[]
+  activities    Activity[]
+  notifications Notification[]
+
+  @@index([ownerId])
+}
+
+model WorkspaceMember {
+  id          String       @id @default(cuid())
+  workspaceId String
+  workspace   Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        WorkspaceRole @default(MEMBER)
+  status      MemberStatus  @default(ACTIVE)
+  joinedAt    DateTime      @default(now())
+  createdAt   DateTime      @default(now())
+
+  @@unique([workspaceId, userId])
+  @@index([userId, status])
+  @@index([workspaceId, status])
+}
+
+model Invitation {
+  id          String           @id @default(cuid())
+  workspaceId String
+  workspace   Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  /// Stored lowercased; the recipient may not have an account yet.
+  email       String
+  tokenHash   String           @unique
+  status      InvitationStatus @default(PENDING)
+  invitedById String
+  invitedBy   User             @relation("InvitationSender", fields: [invitedById], references: [id], onDelete: Cascade)
+  expiresAt   DateTime
+  respondedAt DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([email, status])
+  @@index([workspaceId, status])
+}
+
+// ---------------------------------------------------------------------------
+// Reference data
+// ---------------------------------------------------------------------------
+
+/// Categories are either global presets (userId = NULL) or user-defined.
+model Category {
+  id        String       @id @default(cuid())
+  name      String
+  slug      String
+  icon      String?
+  color     String?
+  kind      CategoryKind @default(EXPENSE)
+  isSystem  Boolean      @default(false)
+  sortOrder Int          @default(100)
+  userId    String?
+  user      User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+
+  transactions    Transaction[]
+  budgetCategories BudgetCategory[]
+  recurring       RecurringTransaction[]
+
+  @@unique([userId, slug])
+  @@index([userId])
+}
+
+model Account {
+  id        String      @id @default(cuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  type      AccountType @default(BANK)
+  /// Masked card/account tail shown in transaction detail, e.g. "8904".
+  last4     String?
+  /// Opening balance in minor units; running balance adds transactions on top.
+  openingBalanceMinor Int  @default(0)
+  isDefault Boolean     @default(false)
+  archived  Boolean     @default(false)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  transactions Transaction[]
+  recurring    RecurringTransaction[]
+
+  @@index([userId, archived])
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  createdAt DateTime @default(now())
+
+  transactions TransactionTag[]
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+model TransactionTag {
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  tagId         String
+  tag           Tag         @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([transactionId, tagId])
+  @@index([tagId])
+}
+
+// ---------------------------------------------------------------------------
+// Money movement
+// ---------------------------------------------------------------------------
+
+model Transaction {
+  id       String          @id @default(cuid())
+  /// Creator/owner. For shared rows this is who ENTERED the transaction.
+  userId   String
+  user     User            @relation("TransactionCreator", fields: [userId], references: [id], onDelete: Cascade)
+  /// NULL = personal. Set = belongs to a shared workspace.
+  workspaceId String?
+  workspace   Workspace?   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  scopeKey    String
+
+  type        TransactionType
+  /// Always positive minor units; direction comes from `type`.
+  amountMinor Int
+  currency    String        @default("INR")
+  merchant    String
+  notes       String?
+
+  categoryId String?
+  category   Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  accountId  String?
+  account    Account?      @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  paymentMethod PaymentMethod @default(UPI)
+
+  /// Who actually paid. Distinct from `userId` (who recorded it) and only
+  /// meaningful for shared rows — this is what a future settlement/balance
+  /// feature reads from.
+  paidByUserId String?
+  paidByUser   User?        @relation("TransactionPayer", fields: [paidByUserId], references: [id], onDelete: SetNull)
+
+  date      DateTime
+  /// Optimistic-concurrency guard; bumped on every write.
+  version   Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tags TransactionTag[]
+
+  @@index([scopeKey, date(sort: Desc)])
+  @@index([scopeKey, categoryId, date])
+  @@index([workspaceId, date(sort: Desc)])
+  @@index([userId, date(sort: Desc)])
+  @@index([paidByUserId])
+  @@index([merchant])
+  @@index([createdAt])
+}
+
+model Budget {
+  id          String     @id @default(cuid())
+  userId      String?
+  user        User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspaceId String?
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  scopeKey    String
+
+  /// 1-12
+  month            Int
+  year             Int
+  totalAmountMinor Int
+  version          Int      @default(1)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  categories BudgetCategory[]
+
+  @@unique([scopeKey, year, month])
+  @@index([workspaceId])
+  @@index([userId])
+}
+
+model BudgetCategory {
+  id                  String   @id @default(cuid())
+  budgetId            String
+  budget              Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  categoryId          String
+  category            Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  allocatedAmountMinor Int
+
+  @@unique([budgetId, categoryId])
+  @@index([categoryId])
+}
+
+model Goal {
+  id          String     @id @default(cuid())
+  userId      String?
+  user        User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspaceId String?
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  scopeKey    String
+
+  name               String
+  targetAmountMinor  Int
+  /// Denormalised sum of contributions, kept in step inside a transaction.
+  currentAmountMinor Int      @default(0)
+  deadline           DateTime?
+  icon               String?
+  theme              String?  // sage | yellow | coral | forest
+  archived           Boolean  @default(false)
+  version            Int      @default(1)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  contributions GoalContribution[]
+
+  @@index([scopeKey, archived])
+  @@index([workspaceId])
+  @@index([userId])
+}
+
+model GoalContribution {
+  id          String   @id @default(cuid())
+  goalId      String
+  goal        Goal     @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  /// Who the contribution is credited to.
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amountMinor Int
+  date        DateTime @default(now())
+  note        String?
+  createdAt   DateTime @default(now())
+
+  @@index([goalId, date(sort: Desc)])
+  @@index([userId])
+}
+
+model RecurringTransaction {
+  id          String     @id @default(cuid())
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspaceId String?
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  scopeKey    String
+
+  merchant      String
+  amountMinor   Int
+  currency      String              @default("INR")
+  type          TransactionType     @default(EXPENSE)
+  frequency     RecurrenceFrequency @default(MONTHLY)
+  categoryId    String?
+  category      Category?           @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  accountId     String?
+  account       Account?            @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  paymentMethod PaymentMethod       @default(UPI)
+  notes         String?
+
+  startDate DateTime
+  nextDate  DateTime
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([scopeKey, active, nextDate])
+  @@index([userId])
+  @@index([workspaceId])
+}
+
+// ---------------------------------------------------------------------------
+// Collaboration surface
+// ---------------------------------------------------------------------------
+
+/// Durable audit trail for a shared workspace. The activity feed is read from
+/// here, never reconstructed from client state.
+model Activity {
+  id          String         @id @default(cuid())
+  workspaceId String
+  workspace   Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  actorId     String
+  actor       User           @relation("ActivityActor", fields: [actorId], references: [id], onDelete: Cascade)
+  action      ActivityAction
+  entityType  String
+  entityId    String?
+  /// { label, amountMinor, previousValue, newValue, ... } — rendered by
+  /// src/lib/activity.ts into human sentences.
+  metadata    Json?
+  createdAt   DateTime       @default(now())
+
+  @@index([workspaceId, createdAt(sort: Desc)])
+  @@index([actorId])
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  userId      String
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspaceId String?
+  workspace   Workspace?       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  type        NotificationType
+  title       String
+  message     String
+  href        String?
+  read        Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+
+  @@index([userId, read, createdAt(sort: Desc)])
+  @@index([workspaceId])
+}
+
+model NotificationPreference {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  sharedTransactions Boolean @default(true)
+  sharedBudgets      Boolean @default(true)
+  sharedGoals        Boolean @default(true)
+  budgetWarnings     Boolean @default(true)
+  membership         Boolean @default(true)
+
+  updatedAt DateTime @updatedAt
+}

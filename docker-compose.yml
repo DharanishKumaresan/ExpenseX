@@ -1,0 +1,31 @@
+# Container-based alternative to `npm run db:start`.
+#
+# Use this if you would rather not run the portable PostgreSQL binaries, or on a
+# platform they do not ship for. After `docker compose up -d db`, point
+# DATABASE_URL at it:
+#
+#   DATABASE_URL="postgresql://expensex:expensex_dev@127.0.0.1:55432/expensex?schema=public"
+#
+# The port matches the portable cluster so the two are interchangeable.
+
+services:
+  db:
+    image: postgres:18-alpine
+    container_name: expensex-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: expensex
+      POSTGRES_PASSWORD: expensex_dev
+      POSTGRES_DB: expensex
+    ports:
+      - '55432:5432'
+    volumes:
+      - expensex-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U expensex -d expensex']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  expensex-pgdata:

@@ -1,0 +1,57 @@
+{
+  "name": "expensex",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "db:start": "node scripts/pg.mjs start",
+    "db:stop": "node scripts/pg.mjs stop",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "db:seed": "node --experimental-strip-types prisma/seed.ts",
+    "db:reset": "prisma migrate reset --force",
+    "setup": "node scripts/setup.mjs",
+    "test": "node --import ./tests/register.mjs --experimental-strip-types --test tests/*.test.ts",
+    "test:unit": "node --import ./tests/register.mjs --experimental-strip-types --test tests/money.test.ts tests/analytics.test.ts",
+    "db:status": "node scripts/pg.mjs status",
+    "db:url": "node scripts/pg.mjs url"
+  },
+  "prisma": {
+    "seed": "node --experimental-strip-types prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.16.2",
+    "bcryptjs": "^3.0.2",
+    "next": "15.5.25",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.13",
+    "@types/node": "^22.18.1",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "embedded-postgres": "^18.4.0-beta.17",
+    "eslint": "^9.35.0",
+    "eslint-config-next": "15.5.25",
+    "prisma": "^6.16.2",
+    "tailwindcss": "^4.1.13",
+    "typescript": "^5.9.2"
+  },
+  "allowScripts": {
+    "prisma@6.19.3": true,
+    "@prisma/client@6.19.3": true,
+    "@prisma/engines@6.19.3": true,
+    "sharp@0.34.5": true,
+    "@embedded-postgres/windows-x64@18.4.0-beta.17": true
+  }
+}
