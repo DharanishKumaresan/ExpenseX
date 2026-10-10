@@ -30,6 +30,9 @@ const securityHeaders = [
       "base-uri 'self'",
       "object-src 'none'",
       "frame-ancestors 'none'",
+      // The PWA service worker and the installed app's own manifest.
+      "worker-src 'self'",
+      "manifest-src 'self'",
     ].join('; '),
   },
 ];
@@ -42,7 +45,36 @@ const nextConfig: NextConfig = {
     serverActions: { bodySizeLimit: '1mb' },
   },
   async headers() {
-    return [{ source: '/:path*', headers: securityHeaders }];
+    return [
+      { source: '/:path*', headers: securityHeaders },
+
+      /**
+       * The worker must never be served from cache: a stale sw.js keeps the
+       * old one alive forever and a deploy never reaches anyone who has
+       * already visited. `Service-Worker-Allowed` lets it claim the whole
+       * origin even though it is fetched from the root.
+       */
+      {
+        source: '/sw.js',
+        headers: [
+          { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' },
+          { key: 'Service-Worker-Allowed', value: '/' },
+          { key: 'Content-Type', value: 'application/javascript; charset=utf-8' },
+        ],
+      },
+      {
+        source: '/manifest.webmanifest',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=0, must-revalidate' },
+          { key: 'Content-Type', value: 'application/manifest+json; charset=utf-8' },
+        ],
+      },
+      // Icon paths are stable across releases, so revalidate their content.
+      {
+        source: '/icons/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=0, must-revalidate' }],
+      },
+    ];
   },
 };
 

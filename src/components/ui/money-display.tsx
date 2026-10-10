@@ -13,13 +13,20 @@ import { cn } from '@/lib/utils';
 
 export type MoneySize = 'hero' | 'xl' | 'lg' | 'md' | 'sm' | 'xs';
 
+/**
+ * Line heights are deliberately >= 1.15 rather than the tighter values the
+ * figures look like they want. JetBrains Mono's glyph box is ~1.32em tall, so
+ * a line-height below that lets the ascenders — the rupee sign worst of all —
+ * spill out of the line box and collide with whatever label sits above. At
+ * 1.15 the spill is 0.085em, which every caller's top margin absorbs.
+ */
 const SIZES: Record<MoneySize, string> = {
-  hero: 'text-[clamp(2.75rem,9vw,5rem)] leading-[0.92]',
-  xl: 'text-[clamp(2rem,5.5vw,3.25rem)] leading-[0.95]',
-  lg: 'text-[clamp(1.5rem,3.5vw,2.125rem)] leading-none',
-  md: 'text-[1.25rem] leading-none',
-  sm: 'text-[1rem] leading-none',
-  xs: 'text-[0.875rem] leading-none',
+  hero: 'text-[clamp(2.75rem,9vw,5rem)] leading-[1.12]',
+  xl: 'text-[clamp(2rem,5.5vw,3.25rem)] leading-[1.14]',
+  lg: 'text-[clamp(1.5rem,3.5vw,2.125rem)] leading-[1.16]',
+  md: 'text-[1.25rem] leading-[1.2]',
+  sm: 'text-[1rem] leading-[1.2]',
+  xs: 'text-[0.875rem] leading-[1.2]',
 };
 
 interface MoneyProps {
@@ -35,6 +42,12 @@ interface MoneyProps {
   fractionClassName?: string;
   /** Force a leading minus even for a positive number (expense rows). */
   forceNegative?: boolean;
+  /**
+   * Render as a block-level figure. `cn` is a plain join, so passing a
+   * `block` utility through `className` fought the base `inline-flex` and the
+   * winner depended on stylesheet order rather than intent.
+   */
+  block?: boolean;
 }
 
 export function Money({
@@ -46,6 +59,7 @@ export function Money({
   className,
   fractionClassName,
   forceNegative,
+  block,
 }: MoneyProps) {
   const effective = forceNegative ? -Math.abs(minor) : minor;
   const parts = formatMoneyParts(effective, currency, { signed });
@@ -53,7 +67,12 @@ export function Money({
 
   return (
     <span
-      className={cn('ex-numeral inline-flex items-baseline whitespace-nowrap', SIZES[size], className)}
+      className={cn(
+        'ex-numeral items-baseline whitespace-nowrap',
+        block ? 'flex' : 'inline-flex',
+        SIZES[size],
+        className,
+      )}
       aria-label={accessible}
     >
       <span aria-hidden="true">

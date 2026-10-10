@@ -134,7 +134,7 @@ export function FilterBar({
             }}
             placeholder="Search merchants and notes"
             aria-label="Search transactions"
-            className="w-full bg-transparent text-[0.875rem] text-ink outline-none placeholder:text-ink-faint"
+            className="w-full min-w-0 bg-transparent text-[0.875rem] text-ink outline-none placeholder:text-ink-faint"
           />
         </div>
 
@@ -273,7 +273,7 @@ export function FilterBar({
             key={entry.key}
             type="button"
             onClick={() => update({ [entry.key]: null })}
-            className="group"
+            className="group inline-flex min-h-8 items-center"
             aria-label={`Remove filter: ${entry.label}`}
           >
             <Badge tone="neutral" className="gap-1.5 transition-colors group-hover:bg-surface-2">
@@ -341,7 +341,7 @@ export function Pagination({
           type="button"
           onClick={() => go(page - 1)}
           disabled={page <= 1}
-          className="h-9 rounded-[7px] border border-line px-3 font-mono text-[0.625rem] tracking-[0.12em] uppercase text-ink-2 transition-colors hover:border-line-strong hover:bg-surface-2 disabled:cursor-not-allowed disabled:opacity-40"
+          className="h-11 rounded-[7px] border border-line px-4 font-mono text-[0.625rem] tracking-[0.12em] uppercase text-ink-2 transition-colors hover:border-line-strong hover:bg-surface-2 disabled:cursor-not-allowed disabled:opacity-40 lg:h-9 lg:px-3"
         >
           Previous
         </button>
@@ -352,7 +352,7 @@ export function Pagination({
           type="button"
           onClick={() => go(page + 1)}
           disabled={page >= pageCount}
-          className="h-9 rounded-[7px] border border-line px-3 font-mono text-[0.625rem] tracking-[0.12em] uppercase text-ink-2 transition-colors hover:border-line-strong hover:bg-surface-2 disabled:cursor-not-allowed disabled:opacity-40"
+          className="h-11 rounded-[7px] border border-line px-4 font-mono text-[0.625rem] tracking-[0.12em] uppercase text-ink-2 transition-colors hover:border-line-strong hover:bg-surface-2 disabled:cursor-not-allowed disabled:opacity-40 lg:h-9 lg:px-3"
         >
           Next
         </button>

@@ -88,7 +88,7 @@ export async function BudgetScreen({
           <span className="block font-bold text-ink">Budget</span>
         </h1>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
           <MonthNav monthKey={monthKey} basePath={basePath} />
           <BudgetActions
             monthKey={monthKey}
@@ -120,7 +120,7 @@ export async function BudgetScreen({
         />
       ) : (
         <>
-          <section className="grid gap-8 lg:grid-cols-12">
+          <section className="grid gap-7 lg:grid-cols-12 lg:gap-10">
             <div className="lg:col-span-5">
               <StatBlock
                 label={`${monthLabel(monthKey)} budget`}
@@ -166,8 +166,8 @@ export async function BudgetScreen({
                   label={`Budget used: ${formatPercent(status.used)}`}
                   height="lg"
                 />
-                <div className="flex items-center justify-between gap-3">
-                  <span className="font-mono text-[0.6875rem] tracking-[0.08em] text-ink-3">
+                <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                  <span className="min-w-0 font-mono text-[0.6875rem] tracking-[0.08em] text-ink-3">
                     {formatPercent(status.used)} of the monthly budget used
                   </span>
                   <BudgetLevelBadge level={status.level} />
@@ -238,7 +238,7 @@ export async function BudgetScreen({
             </section>
           ) : null}
 
-          <section className="grid gap-8 lg:grid-cols-12">
+          <section className="grid gap-8 lg:grid-cols-12 lg:gap-10">
             <div className="lg:col-span-7">
               <RuleLabel className="mb-4">Category allocations</RuleLabel>
               {status.categories.length > 0 ? (

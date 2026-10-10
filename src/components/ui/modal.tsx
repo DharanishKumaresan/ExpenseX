@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useId, useRef } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
@@ -43,6 +43,10 @@ export function Modal({
   dismissible = true,
 }: ModalProps) {
   const ref = useRef<HTMLDialogElement>(null);
+  // A screen can hold several dialogs at once (a sheet plus its delete
+  // confirmation). A shared literal id made every one of them announce the
+  // first dialog's title.
+  const titleId = useId();
 
   useEffect(() => {
     const dialog = ref.current;
@@ -83,7 +87,7 @@ export function Modal({
       ref={ref}
       onCancel={handleCancel}
       onClick={handleBackdropClick}
-      aria-labelledby="ex-modal-title"
+      aria-labelledby={titleId}
       className={cn(
         'w-full max-w-none bg-transparent p-0 text-ink backdrop:bg-[color-mix(in_srgb,var(--ex-ink)_55%,transparent)]',
         'm-0 mt-auto sm:m-auto',
@@ -107,7 +111,7 @@ export function Modal({
             <div className="min-w-0">
               {eyebrow ? <p className="ex-label mb-1.5">{eyebrow}</p> : null}
               <h2
-                id="ex-modal-title"
+                id={titleId}
                 className="text-[1.35rem] leading-tight font-bold tracking-[-0.02em] text-ink sm:text-[1.6rem]"
               >
                 {title}
@@ -121,7 +125,7 @@ export function Modal({
                 type="button"
                 onClick={onClose}
                 aria-label="Close"
-                className="-mt-1 -mr-1 shrink-0 rounded-[6px] p-2 text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink"
+                className="-mt-1.5 -mr-1.5 grid size-10 shrink-0 place-items-center rounded-[6px] text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink"
               >
                 <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
                   <path d="M3 3L13 13M13 3L3 13" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" />
@@ -130,7 +134,16 @@ export function Modal({
             ) : null}
           </header>
 
-          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-5 sm:px-6">{children}</div>
+          <div
+            className={cn(
+              'min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-5 sm:px-6',
+              // Without a footer the sheet's own bottom edge is the last thing
+              // above the home indicator, so it carries the inset itself.
+              !footer && 'pb-[max(1.25rem,env(safe-area-inset-bottom))]',
+            )}
+          >
+            {children}
+          </div>
 
           {footer ? (
             <footer className="border-t border-line bg-surface-2 px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6">

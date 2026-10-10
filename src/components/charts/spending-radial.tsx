@@ -216,11 +216,17 @@ export function SpendingRadial({ slices, totalMinor, currency, caption, classNam
         />
       </svg>
 
-      {/* Centre readout, overlaid so it can use real typography. */}
-      <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center px-[26%] text-center">
+      {/* Centre readout, overlaid so it can use real typography. The padding is
+          derived from the well: the disc is 2 x INNER_RADIUS wide out of a
+          VIEWBOX-wide square, so anything wider than that spills over the rays
+          instead of sitting inside the circle. */}
+      <div
+        className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center"
+        style={{ paddingInline: `${((VIEWBOX - INNER_RADIUS * 2) / 2 / VIEWBOX) * 100}%` }}
+      >
         {activeSlice ? (
           <>
-            <span className="ex-label mb-1.5 truncate max-w-full">{activeSlice.name}</span>
+            <span className="ex-label mb-1.5 max-w-full truncate">{activeSlice.name}</span>
             <Money
               minor={activeSlice.spentMinor}
               currency={currency}
@@ -237,7 +243,7 @@ export function SpendingRadial({ slices, totalMinor, currency, caption, classNam
           </>
         ) : (
           <>
-            <span className="ex-label mb-1.5">{caption ?? 'Total spent'}</span>
+            <span className="ex-label mb-1.5 max-w-full truncate">{caption ?? 'Total spent'}</span>
             <Money minor={totalMinor} currency={currency} size="md" hideFraction className="text-ink" />
           </>
         )}

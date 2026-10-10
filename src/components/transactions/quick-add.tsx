@@ -98,10 +98,12 @@ export function QuickAdd({
         onClick={() => setOpen(true)}
         aria-label="Add expense"
         className={cn(
-          'ex-no-print fixed right-4 z-40 grid size-14 place-items-center rounded-full bg-accent text-on-accent',
+          'ex-no-print fixed z-40 grid size-14 place-items-center rounded-full bg-accent text-on-accent',
           'shadow-[0_6px_20px_-6px_rgba(0,0,0,0.45)] transition-transform duration-200 hover:scale-105 active:scale-95',
-          // Clears the mobile bottom bar; sits lower on desktop where there is none.
-          'bottom-[calc(4.5rem+env(safe-area-inset-bottom))] lg:right-8 lg:bottom-8',
+          // Clears the mobile bottom bar and the landscape notch; sits lower on
+          // desktop, where there is no bottom bar.
+          'right-[max(1rem,env(safe-area-inset-right))] bottom-[calc(4.5rem+env(safe-area-inset-bottom))]',
+          'lg:right-8 lg:bottom-8',
         )}
       >
         <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">

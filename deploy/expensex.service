@@ -1,0 +1,41 @@
+# systemd unit for ExpenseX.
+#
+#   sudo cp deploy/expensex.service /etc/systemd/system/expensex.service
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now expensex
+#   sudo journalctl -u expensex -f
+#
+# Adjust User and WorkingDirectory if you deploy somewhere other than
+# /var/www/expensex as the `expensex` user.
+
+[Unit]
+Description=ExpenseX (Next.js)
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=expensex
+Group=expensex
+WorkingDirectory=/var/www/expensex
+Environment=NODE_ENV=production
+Environment=PORT=3000
+Environment=HOSTNAME=127.0.0.1
+# Secrets live in .env, which is read by Next at boot and must stay 0600.
+EnvironmentFile=/var/www/expensex/.env
+ExecStart=/usr/bin/npm run start
+Restart=always
+RestartSec=5
+
+# The app needs to write nothing outside its own directory.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=expensex
+
+[Install]
+WantedBy=multi-user.target

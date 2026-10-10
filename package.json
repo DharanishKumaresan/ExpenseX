@@ -19,6 +19,8 @@
     "db:seed": "node --experimental-strip-types prisma/seed.ts",
     "db:reset": "prisma migrate reset --force",
     "setup": "node scripts/setup.mjs",
+    "package": "node scripts/package.mjs",
+    "icons": "node scripts/icons.mjs",
     "test": "node --import ./tests/register.mjs --experimental-strip-types --test tests/*.test.ts",
     "test:unit": "node --import ./tests/register.mjs --experimental-strip-types --test tests/money.test.ts tests/analytics.test.ts",
     "db:status": "node scripts/pg.mjs status",

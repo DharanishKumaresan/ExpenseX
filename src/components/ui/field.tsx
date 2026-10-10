@@ -63,6 +63,9 @@ export function Field({
   );
 }
 
+// Controls are 44px tall on touch and 44px is also the minimum the layout
+// gives them; the base font size is raised globally on coarse pointers (see
+// globals.css) so iOS never zooms the viewport on focus.
 const CONTROL_BASE =
   'w-full rounded-[8px] border border-line bg-surface-3 px-3 text-[0.9375rem] text-ink ' +
   'placeholder:text-ink-faint transition-colors ' +
@@ -172,7 +175,9 @@ export function SegmentedField<T extends string>({
   const groupId = useId();
   return (
     <fieldset className="flex flex-col gap-1.5">
-      <legend className="ex-label mb-1.5">{label}</legend>
+      <legend id={groupId} className="ex-label mb-1.5">
+        {label}
+      </legend>
       <div
         role="radiogroup"
         aria-labelledby={groupId}
@@ -243,7 +248,7 @@ export function Toggle({
         </label>
         {description ? <p className="mt-0.5 text-[0.75rem] leading-snug text-ink-3">{description}</p> : null}
       </div>
-      <label className="relative inline-flex shrink-0 cursor-pointer items-center">
+      <label className="relative inline-flex min-h-11 shrink-0 cursor-pointer items-center">
         <input
           id={id}
           name={name}

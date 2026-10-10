@@ -97,13 +97,10 @@ export async function TransactionsScreen({
 
   return (
     <div className="flex flex-col gap-7">
-      <header className="flex flex-wrap items-end justify-between gap-4">
+      <header className="flex flex-wrap items-end justify-between gap-x-4 gap-y-5">
         <h1 className="text-[1.75rem] leading-[1.02] font-semibold tracking-[-0.03em] sm:text-[2.25rem]">
-          <span className="block font-normal text-ink-faint">
-            {shared ? 'Everything we' : 'All recent'}
-          </span>
           <span className="block font-bold text-ink">
-            {shared ? 'Spent together' : 'Transactions'}
+            {shared ? 'Shared transactions' : 'Transactions'}
           </span>
         </h1>
 
@@ -126,22 +123,25 @@ export async function TransactionsScreen({
         resultCount={result.total}
       />
 
+      {/* Labels are kept short enough to hold one line at 360px: a two-line
+          label beside a one-line label dropped the two figures onto different
+          baselines and the row stopped reading as a row. */}
       {rows.length > 0 ? (
-        <dl className="grid grid-cols-2 gap-4 border-y border-line py-4 sm:grid-cols-3">
-          <div>
-            <dt className="ex-label">Spent on this page</dt>
+        <dl className="grid grid-cols-2 gap-x-5 gap-y-4 border-y border-line py-4 sm:grid-cols-3">
+          <div className="min-w-0">
+            <dt className="ex-label">Spent on page</dt>
             <dd className="mt-1.5">
               <Money minor={pageTotals.expenseMinor} currency={scope.currency} size="sm" hideFraction className="text-ink" />
             </dd>
           </div>
-          <div>
-            <dt className="ex-label">Received on this page</dt>
+          <div className="min-w-0">
+            <dt className="ex-label">Received on page</dt>
             <dd className="mt-1.5">
               <Money minor={pageTotals.incomeMinor} currency={scope.currency} size="sm" hideFraction className="text-ink" />
             </dd>
           </div>
-          <div className="col-span-2 sm:col-span-1">
-            <dt className="ex-label">Matching transactions</dt>
+          <div className="col-span-2 min-w-0 sm:col-span-1">
+            <dt className="ex-label">Matching in total</dt>
             <dd className="ex-numeral mt-1.5 text-[1rem] text-ink">{result.total}</dd>
           </div>
         </dl>

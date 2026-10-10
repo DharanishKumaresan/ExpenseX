@@ -117,8 +117,8 @@ export default async function SharedPage({
 
   return (
     <div className="flex flex-col gap-10 lg:gap-14">
-      <header className="flex flex-wrap items-start justify-between gap-4">
-        <div className="flex items-center gap-3">
+      <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+        <div className="flex min-w-0 items-center gap-3">
           <AvatarPair names={workspace.members.map((member) => member.name)} size="md" />
           <div className="min-w-0">
             <p className="ex-label">Shared with</p>
@@ -132,7 +132,7 @@ export default async function SharedPage({
 
         <Link
           href="/shared/settings"
-          className="font-mono text-[0.6875rem] tracking-[0.14em] uppercase text-ink-3 transition-colors hover:text-ink"
+          className="-mr-2 inline-flex h-10 shrink-0 items-center rounded-[7px] px-2 font-mono text-[0.6875rem] tracking-[0.14em] uppercase text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink"
         >
           Space settings
         </Link>

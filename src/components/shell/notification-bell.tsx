@@ -61,7 +61,7 @@ export function NotificationBell({
         aria-expanded={open}
         aria-haspopup="menu"
         aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'}
-        className="relative grid size-9 place-items-center rounded-[7px] text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink"
+        className="relative grid size-10 shrink-0 place-items-center rounded-[7px] text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink lg:size-9"
       >
         <svg width="17" height="17" viewBox="0 0 18 18" fill="none" aria-hidden="true">
           <path

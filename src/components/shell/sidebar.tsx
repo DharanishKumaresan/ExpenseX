@@ -28,7 +28,7 @@ export function Sidebar({
   const pathname = usePathname();
 
   return (
-    <aside className="ex-no-print sticky top-0 hidden h-dvh w-[248px] shrink-0 flex-col gap-6 px-5 py-6 lg:flex xl:w-[268px]">
+    <aside className="ex-no-print sticky top-0 hidden h-dvh w-[248px] shrink-0 flex-col gap-5 px-5 py-5 lg:flex xl:w-[268px] xl:gap-6 xl:py-6">
       <Link href="/overview" className="flex items-baseline px-1">
         <span className="text-[1.5rem] leading-none font-extrabold tracking-[-0.05em] text-ink">
           expense
@@ -40,7 +40,13 @@ export function Sidebar({
 
       <WorkspaceSwitcher workspace={workspace} userName={userName} />
 
-      <nav aria-label="Main" className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto">
+      {/* On a short laptop screen the three groups do not fit. The rail scrolls
+          rather than clipping, and hides its scrollbar so the nav does not grow
+          a second vertical rule beside the one the design already has. */}
+      <nav
+        aria-label="Main"
+        className="ex-no-scrollbar flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto overscroll-contain pb-2"
+      >
         <NavGroup label="Personal" items={PERSONAL_NAV} pathname={pathname} />
 
         <NavGroup
@@ -51,7 +57,9 @@ export function Sidebar({
           hint={hasSharedSpace ? undefined : 'Not set up yet'}
         />
 
-        <div className="mt-auto pt-2">
+        {/* `mt-auto` inside a scroll container pins System to the bottom when
+            there is room and lets it flow normally when there is not. */}
+        <div className="mt-auto pt-1">
           <NavGroup label="System" items={SYSTEM_NAV} pathname={pathname} />
         </div>
       </nav>
@@ -93,7 +101,7 @@ function NavGroup({
                 href={item.href}
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'flex items-center gap-2.5 rounded-[7px] px-2.5 py-[7px] text-[0.875rem] transition-colors',
+                  'flex min-h-9 items-center gap-2.5 rounded-[7px] px-2.5 py-[7px] text-[0.875rem] transition-colors',
                   active
                     ? 'bg-surface-2 font-semibold text-ink'
                     : 'font-medium text-ink-3 hover:bg-surface-2/60 hover:text-ink',

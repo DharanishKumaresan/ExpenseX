@@ -20,7 +20,14 @@ const OPTIONS: { value: ThemePreference; label: string }[] = [
  * pre-paint bootstrap script, and to the user record so a new device inherits
  * it. "System" keeps listening to the OS setting for as long as it is chosen.
  */
-export function ThemeToggle({ compact }: { compact?: boolean }) {
+export function ThemeToggle({
+  compact,
+  hideLegend,
+}: {
+  compact?: boolean;
+  /** The surrounding section already names this group; do not repeat it. */
+  hideLegend?: boolean;
+}) {
   const [preference, setPreference] = useState<ThemePreference>('system');
   const [, startTransition] = useTransition();
 
@@ -70,7 +77,7 @@ export function ThemeToggle({ compact }: { compact?: boolean }) {
         type="button"
         onClick={() => choose(next)}
         aria-label={`Switch to ${next} theme`}
-        className="grid size-9 place-items-center rounded-[7px] text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink"
+        className="grid size-10 shrink-0 place-items-center rounded-[7px] text-ink-2 transition-colors hover:bg-surface-2 hover:text-ink lg:size-9"
       >
         <SunMoon />
       </button>
@@ -79,7 +86,7 @@ export function ThemeToggle({ compact }: { compact?: boolean }) {
 
   return (
     <fieldset>
-      <legend className="ex-label mb-2">Appearance</legend>
+      <legend className={cn('ex-label mb-2', hideLegend && 'sr-only')}>Appearance</legend>
       <div role="radiogroup" className="grid grid-cols-3 gap-1.5">
         {OPTIONS.map((option) => (
           <button

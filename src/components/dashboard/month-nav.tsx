@@ -34,7 +34,7 @@ export function MonthNav({
       <Link
         href={href(previous)}
         aria-label={`Previous month, ${monthLabel(previous)}`}
-        className="grid size-9 place-items-center rounded-[7px] border border-line text-ink-2 transition-colors hover:border-line-strong hover:bg-surface-2 hover:text-ink"
+        className="grid size-11 place-items-center rounded-[7px] border border-line text-ink-2 transition-colors hover:border-line-strong hover:bg-surface-2 hover:text-ink lg:size-9"
       >
         <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
           <path d="M7.5 2L3.5 6L7.5 10" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
@@ -44,7 +44,7 @@ export function MonthNav({
       {nextDisabled ? (
         <span
           aria-disabled="true"
-          className="grid size-9 cursor-not-allowed place-items-center rounded-[7px] border border-line-faint text-ink-faint"
+          className="grid size-11 cursor-not-allowed place-items-center rounded-[7px] border border-line-faint text-ink-faint lg:size-9"
         >
           <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
             <path d="M4.5 2L8.5 6L4.5 10" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
@@ -54,7 +54,7 @@ export function MonthNav({
         <Link
           href={href(next)}
           aria-label={`Next month, ${monthLabel(next)}`}
-          className="grid size-9 place-items-center rounded-[7px] border border-line text-ink-2 transition-colors hover:border-line-strong hover:bg-surface-2 hover:text-ink"
+          className="grid size-11 place-items-center rounded-[7px] border border-line text-ink-2 transition-colors hover:border-line-strong hover:bg-surface-2 hover:text-ink lg:size-9"
         >
           <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
             <path d="M4.5 2L8.5 6L4.5 10" stroke="currentColor" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
@@ -65,7 +65,7 @@ export function MonthNav({
       {!isCurrent ? (
         <Link
           href={basePath}
-          className="ml-1 h-9 rounded-[7px] border border-line px-3 font-mono text-[0.625rem] leading-[2.15rem] tracking-[0.12em] uppercase text-ink-3 transition-colors hover:border-line-strong hover:text-ink"
+          className="ml-1 inline-flex h-11 items-center rounded-[7px] border border-line px-3 font-mono text-[0.625rem] tracking-[0.12em] uppercase text-ink-3 transition-colors hover:border-line-strong hover:text-ink lg:h-9"
         >
           This month
         </Link>

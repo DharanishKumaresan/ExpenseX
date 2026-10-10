@@ -8,6 +8,7 @@ import { ConfirmDialog, Modal } from '@/components/ui/modal';
 import { Badge, ErrorNote, RuleLabel } from '@/components/ui/primitives';
 import { Money } from '@/components/ui/money-display';
 import { ThemeToggle } from '@/components/shell/theme-toggle';
+import { InstallPrompt } from '@/components/pwa/install-prompt';
 import { useToast } from '@/components/ui/toast';
 import {
   archiveAccount,
@@ -70,7 +71,12 @@ export function SettingsScreen({
 
       <section className="flex max-w-xl flex-col gap-5">
         <RuleLabel>Appearance</RuleLabel>
-        <ThemeToggle />
+        <ThemeToggle hideLegend />
+      </section>
+
+      <section className="flex max-w-xl flex-col gap-5">
+        <RuleLabel>Install</RuleLabel>
+        <InstallPrompt />
       </section>
 
       <AccountsSection accounts={accounts} currency={user.currency} />
@@ -197,7 +203,7 @@ function AccountsSection({ accounts, currency }: { accounts: AccountView[]; curr
             setEditing(null);
             setOpen(true);
           }}
-          className="shrink-0 font-mono text-[0.625rem] tracking-[0.12em] uppercase text-ink-3 transition-colors hover:text-ink"
+          className="-mr-2 inline-flex h-10 shrink-0 items-center rounded-[7px] px-2 font-mono text-[0.625rem] tracking-[0.12em] uppercase text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink"
         >
           + Add account
         </button>
@@ -210,11 +216,14 @@ function AccountsSection({ accounts, currency }: { accounts: AccountView[]; curr
       ) : (
         <ul className="flex flex-col">
           {accounts.map((account) => (
+            // Name, balance and two controls do not fit one 360px line without
+            // truncating the account name to nothing, so the controls drop to
+            // their own row below `xs` and rejoin it above.
             <li
               key={account.id}
-              className="flex items-center gap-3 border-b border-line-faint py-3.5 last:border-0"
+              className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-line-faint py-3.5 last:border-0"
             >
-              <div className="min-w-0 flex-1">
+              <div className="w-full min-w-0 xs:w-auto xs:flex-1">
                 <p className="truncate text-[0.9375rem] font-semibold text-ink">
                   {account.name}
                   {account.last4 ? <span className="text-ink-3"> ···· {account.last4}</span> : null}
@@ -230,13 +239,14 @@ function AccountsSection({ accounts, currency }: { accounts: AccountView[]; curr
                 className={account.balanceMinor < 0 ? 'text-coral' : 'text-ink'}
               />
 
+              <div className="ml-auto flex shrink-0 items-center gap-1.5">
               <button
                 type="button"
                 onClick={() => {
                   setEditing(account);
                   setOpen(true);
                 }}
-                className="h-9 shrink-0 rounded-[7px] border border-line px-3 font-mono text-[0.625rem] tracking-[0.12em] uppercase text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink"
+                className="h-11 shrink-0 rounded-[7px] border border-line px-3.5 font-mono text-[0.625rem] tracking-[0.12em] uppercase text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink lg:h-9 lg:px-3"
               >
                 Edit
               </button>
@@ -244,12 +254,13 @@ function AccountsSection({ accounts, currency }: { accounts: AccountView[]; curr
                 type="button"
                 onClick={() => setConfirmId(account.id)}
                 aria-label={`Remove ${account.name}`}
-                className="grid size-9 shrink-0 place-items-center rounded-[7px] text-ink-3 transition-colors hover:bg-coral/10 hover:text-coral"
+                className="grid size-11 shrink-0 place-items-center rounded-[7px] text-ink-3 transition-colors hover:bg-coral/10 hover:text-coral lg:size-9"
               >
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                   <path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 8.2h5.8l.6-8.2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </button>
+              </div>
             </li>
           ))}
         </ul>
@@ -377,8 +388,9 @@ function CategoriesSection({ categories }: { categories: { id: string; name: str
 
       <form onSubmit={add} className="flex flex-col gap-3">
         {error ? <ErrorNote title="Could not add" message={error} /> : null}
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Input
+            className="min-w-0 flex-1"
             value={name}
             onChange={(event) => setName(event.target.value)}
             placeholder="Pet care"
@@ -401,7 +413,7 @@ function CategoriesSection({ categories }: { categories: { id: string; name: str
                   type="button"
                   onClick={() => remove(category.id, category.name)}
                   aria-label={`Remove ${category.name}`}
-                  className="grid size-5 place-items-center rounded-[4px] text-ink-3 transition-colors hover:bg-coral/15 hover:text-coral"
+                  className="grid size-7 place-items-center rounded-[4px] text-ink-3 transition-colors hover:bg-coral/15 hover:text-coral"
                 >
                   <svg width="8" height="8" viewBox="0 0 8 8" aria-hidden="true">
                     <path d="M1 1L7 7M7 1L1 7" stroke="currentColor" strokeWidth="1.5" />

@@ -70,7 +70,7 @@ export function parseRange(
 
 export function RangePicker({ basePath, active }: { basePath: string; active: RangeKey }) {
   return (
-    <nav aria-label="Date range" className="ex-no-scrollbar -mx-1 flex gap-1.5 overflow-x-auto px-1">
+    <nav aria-label="Date range" className="ex-no-scrollbar ex-rail flex gap-1.5">
       {PRESETS.map((preset) => {
         const selected = preset.key === active;
         return (
@@ -79,7 +79,7 @@ export function RangePicker({ basePath, active }: { basePath: string; active: Ra
             href={`${basePath}?range=${preset.key}`}
             aria-current={selected ? 'true' : undefined}
             className={cn(
-              'inline-flex h-9 shrink-0 items-center rounded-[7px] border px-3 font-mono text-[0.625rem] tracking-[0.12em] uppercase transition-colors',
+              'inline-flex h-11 shrink-0 items-center rounded-[7px] border px-3.5 font-mono text-[0.625rem] tracking-[0.12em] uppercase transition-colors lg:h-9 lg:px-3',
               selected
                 ? 'border-ink bg-forest text-on-forest'
                 : 'border-line text-ink-3 hover:border-line-strong hover:bg-surface-2 hover:text-ink',

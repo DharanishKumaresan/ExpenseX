@@ -91,7 +91,7 @@ export default async function OverviewPage({
               <RadialLegend slices={data.radial} currency={data.currency} limit={7} />
               <Link
                 href="/analytics"
-                className="mt-1 font-mono text-[0.6875rem] tracking-[0.14em] uppercase text-ink-3 transition-colors hover:text-ink"
+                className="mt-1 -ml-2 inline-flex h-9 w-fit items-center rounded-[7px] px-2 font-mono text-[0.6875rem] tracking-[0.14em] uppercase text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink"
               >
                 Full analytics →
               </Link>
@@ -139,7 +139,7 @@ export default async function OverviewPage({
             action={
               <Link
                 href="/transactions"
-                className="font-mono text-[0.6875rem] tracking-[0.14em] uppercase text-ink-3 transition-colors hover:text-ink"
+                className="-mr-2 inline-flex h-9 items-center rounded-[7px] px-2 font-mono text-[0.6875rem] tracking-[0.14em] uppercase text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink"
               >
                 Show more
               </Link>
@@ -166,7 +166,7 @@ export default async function OverviewPage({
             action={
               <Link
                 href="/budgets"
-                className="font-mono text-[0.6875rem] tracking-[0.14em] uppercase text-ink-3 transition-colors hover:text-ink"
+                className="-mr-2 inline-flex h-9 items-center rounded-[7px] px-2 font-mono text-[0.6875rem] tracking-[0.14em] uppercase text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink"
               >
                 Manage
               </Link>
@@ -190,7 +190,7 @@ export default async function OverviewPage({
             action={
               <Link
                 href="/goals"
-                className="font-mono text-[0.6875rem] tracking-[0.14em] uppercase text-ink-3 transition-colors hover:text-ink"
+                className="-mr-2 inline-flex h-9 items-center rounded-[7px] px-2 font-mono text-[0.6875rem] tracking-[0.14em] uppercase text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink"
               >
                 All goals
               </Link>
@@ -207,7 +207,7 @@ export default async function OverviewPage({
             action={
               <Link
                 href="/recurring"
-                className="font-mono text-[0.6875rem] tracking-[0.14em] uppercase text-ink-3 transition-colors hover:text-ink"
+                className="-mr-2 inline-flex h-9 items-center rounded-[7px] px-2 font-mono text-[0.6875rem] tracking-[0.14em] uppercase text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink"
               >
                 Manage
               </Link>

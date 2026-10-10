@@ -27,13 +27,13 @@ const VARIANTS: Record<ButtonVariant, string> = {
 };
 
 const SIZES: Record<ButtonSize, string> = {
-  sm: 'h-8 px-3 text-[0.6875rem] tracking-[0.14em]',
-  md: 'h-11 px-5 text-[0.75rem] tracking-[0.14em]',
-  lg: 'h-14 px-7 text-[0.8125rem] tracking-[0.16em]',
+  sm: 'h-8 px-3 text-xs',
+  md: 'h-11 px-5 text-sm',
+  lg: 'h-14 px-7 text-base',
 };
 
 const BASE =
-  'inline-flex items-center justify-center gap-2 rounded-[8px] font-mono font-medium uppercase ' +
+  'inline-flex items-center justify-center gap-2 rounded-[8px] font-sans font-medium ' +
   'transition-colors duration-150 select-none ' +
   'disabled:cursor-not-allowed disabled:opacity-60 disabled:active:translate-y-0';
 

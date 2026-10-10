@@ -40,21 +40,25 @@ export function OverviewHero({
 
   return (
     <section className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
+      {/* The stepper is pinned to the top-right at every width, level with the
+          month it steps. Letting it wrap under the figure left a dead band of
+          whitespace on narrow screens and read as a stray control. */}
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0 flex-1">
           <p className="ex-label ex-label-lg">{monthLabel(monthKey).toUpperCase()}</p>
-          <p className="ex-label mt-3">{label}</p>
+          <p className="ex-label mt-2.5">{label}</p>
           <Money
             minor={availableMinor}
             currency={currency}
             size="hero"
-            className={cn('mt-2 block', availableMinor < 0 ? 'text-coral' : 'text-ink')}
+            block
+            className={cn('mt-1.5', availableMinor < 0 ? 'text-coral' : 'text-ink')}
           />
         </div>
-        {action}
+        {action ? <div className="shrink-0">{action}</div> : null}
       </div>
 
-      <dl className="grid grid-cols-2 gap-x-4 gap-y-6 border-t border-line pt-6 sm:grid-cols-3">
+      <dl className="grid grid-cols-2 gap-x-5 gap-y-6 border-t border-line pt-6 sm:grid-cols-3">
         <div>
           <dt className="ex-label">Total income</dt>
           <dd className="mt-2">
@@ -69,7 +73,7 @@ export function OverviewHero({
         </div>
         <div className="col-span-2 sm:col-span-1">
           <dt className="ex-label">{budget ? 'Budget remaining' : 'Net'}</dt>
-          <dd className="mt-2 flex items-baseline gap-3">
+          <dd className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <Money
               minor={budget ? budget.remainingMinor : cash.netMinor}
               currency={currency}
@@ -80,7 +84,7 @@ export function OverviewHero({
               )}
             />
             {cash.savingsRate !== null ? (
-              <span className="font-mono text-[0.6875rem] tracking-[0.08em] text-ink-3">
+              <span className="font-mono text-[0.6875rem] tracking-[0.08em] whitespace-nowrap text-ink-3">
                 {formatPercent(cash.savingsRate)} saved
               </span>
             ) : null}
@@ -320,7 +324,8 @@ export function GoalStrip({
                     currency={currency}
                     size="md"
                     hideFraction
-                    className="mt-1.5 block"
+                    block
+                    className="mt-1.5"
                     fractionClassName={tone === 'accent' ? 'text-on-accent/55' : 'text-on-forest-muted'}
                   />
                   <p className="mt-2 truncate text-[1rem] font-bold tracking-[-0.01em]">{goal.name}</p>
@@ -340,7 +345,8 @@ export function GoalStrip({
                     currency={currency}
                     size="sm"
                     hideFraction
-                    className="mt-1.5 block"
+                    block
+                    className="mt-1.5"
                     fractionClassName={tone === 'accent' ? 'text-on-accent/55' : 'text-on-forest-muted'}
                   />
                   <p className="ex-numeral mt-2 text-[0.8125rem]">{formatPercent(progress)}</p>

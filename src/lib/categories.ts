@@ -37,16 +37,16 @@ export const CATEGORY_SWATCH: Record<CategorySwatch, string> = {
   // An eight-step tonal ramp through the olive family, plus the two accents.
   // The steps are spaced far enough apart to stay separable in the radial
   // chart while still reading as one material rather than a rainbow.
-  ink: '#1E2620',
-  forest: '#33402F',
-  moss: '#4C5C42',
-  fern: '#667455',
-  slate: '#5A6B6A',
-  sage: '#838F72',
-  stone: '#A0AA90',
-  clay: '#B08968',
-  accent: '#D4BD35',
-  coral: '#D4573A',
+  ink: '#262626',
+  forest: '#404040',
+  moss: '#555555',
+  fern: '#707070',
+  slate: '#858585',
+  sage: '#999999',
+  stone: '#adadad',
+  clay: '#bfbfbf',
+  accent: '#d2d2d2',
+  coral: '#e5e5e5',
 };
 
 export const CATEGORY_PRESETS: readonly CategoryPreset[] = [

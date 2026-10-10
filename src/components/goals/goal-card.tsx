@@ -106,7 +106,8 @@ export function GoalCard({
               minor={goal.currentMinor}
               currency={currency}
               size="xl"
-              className="mt-2 block"
+              block
+              className="mt-2"
               fractionClassName={palette.fraction}
             />
             <h3 className="mt-3 text-[1.25rem] leading-tight font-bold tracking-[-0.02em]">{goal.name}</h3>
@@ -119,7 +120,8 @@ export function GoalCard({
               currency={currency}
               size="sm"
               hideFraction
-              className="mt-2 block"
+              block
+              className="mt-2"
               fractionClassName={palette.fraction}
             />
             <p className="ex-numeral mt-2 text-[1rem]">{formatPercent(goal.progress)}</p>
@@ -143,7 +145,7 @@ export function GoalCard({
           <HatchField fill={1} onDark={tone !== 'surface'} className="h-5 w-20 shrink-0 opacity-50" />
         </div>
 
-        <dl className={cn('grid grid-cols-2 gap-4 border-t pt-4 sm:grid-cols-4', palette.border)}>
+        <dl className={cn('grid grid-cols-2 gap-x-5 gap-y-4 border-t pt-4 sm:grid-cols-4', palette.border)}>
           <div>
             <dt className={cn('ex-label', palette.label)}>Remaining</dt>
             <dd className="ex-numeral mt-1.5 text-[0.9375rem]">
@@ -210,54 +212,64 @@ export function GoalCard({
           </div>
         ) : null}
 
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setContributeOpen(true)}
-            className={cn(
-              'inline-flex h-10 items-center rounded-[8px] px-4 font-mono text-[0.6875rem] tracking-[0.14em] uppercase transition-opacity hover:opacity-90',
-              palette.button,
-            )}
-          >
-            Add money
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setEditOpen(true)}
-            className={cn(
-              'inline-flex h-10 items-center rounded-[8px] px-4 font-mono text-[0.6875rem] tracking-[0.14em] uppercase transition-colors hover:bg-current/10',
-              palette.ghost,
-            )}
-          >
-            Edit
-          </button>
-
-          {goal.contributions.length > 0 ? (
+        {/* Two groups, not four loose buttons: the primary pair stays left and
+            the secondary pair stays right, so when the row wraps on a narrow
+            screen the delete control never strands itself on a line of its
+            own under the left edge. */}
+        <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-3">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
-              onClick={() => setExpanded((value) => !value)}
-              aria-expanded={expanded}
-              className={cn('ml-auto font-mono text-[0.625rem] tracking-[0.12em] uppercase', palette.label)}
+              onClick={() => setContributeOpen(true)}
+              className={cn(
+                'inline-flex h-11 items-center rounded-[8px] px-4 font-mono text-[0.6875rem] tracking-[0.14em] uppercase transition-opacity hover:opacity-90',
+                palette.button,
+              )}
             >
-              {expanded ? 'Hide history' : `History (${goal.contributions.length})`}
+              Add money
             </button>
-          ) : null}
 
-          <button
-            type="button"
-            onClick={() => setConfirmOpen(true)}
-            aria-label={`Delete ${goal.name}`}
-            className={cn(
-              'inline-flex size-10 items-center justify-center rounded-[8px] transition-colors hover:bg-current/10',
-              goal.contributions.length > 0 ? '' : 'ml-auto',
-              palette.label,
-            )}
-          >
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 8.2h5.8l.6-8.2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
+            <button
+              type="button"
+              onClick={() => setEditOpen(true)}
+              className={cn(
+                'inline-flex h-11 items-center rounded-[8px] px-4 font-mono text-[0.6875rem] tracking-[0.14em] uppercase transition-colors hover:bg-current/10',
+                palette.ghost,
+              )}
+            >
+              Edit
+            </button>
+          </div>
+
+          <div className="ml-auto flex items-center gap-1">
+            {goal.contributions.length > 0 ? (
+              <button
+                type="button"
+                onClick={() => setExpanded((value) => !value)}
+                aria-expanded={expanded}
+                className={cn(
+                  'inline-flex h-11 items-center rounded-[8px] px-2 font-mono text-[0.625rem] tracking-[0.12em] uppercase transition-colors hover:bg-current/10',
+                  palette.label,
+                )}
+              >
+                {expanded ? 'Hide history' : `History (${goal.contributions.length})`}
+              </button>
+            ) : null}
+
+            <button
+              type="button"
+              onClick={() => setConfirmOpen(true)}
+              aria-label={`Delete ${goal.name}`}
+              className={cn(
+                'inline-flex size-11 items-center justify-center rounded-[8px] transition-colors hover:bg-current/10',
+                palette.label,
+              )}
+            >
+              <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 8.2h5.8l.6-8.2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {expanded ? (

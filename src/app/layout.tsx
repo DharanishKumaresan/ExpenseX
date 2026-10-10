@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Archivo, JetBrains_Mono } from 'next/font/google';
 import { getCurrentUser } from '@/server/auth/session';
 import { ToastProvider } from '@/components/ui/toast';
+import { ServiceWorkerRegistrar } from '@/components/pwa/service-worker';
 import './globals.css';
 
 /**
@@ -24,6 +25,9 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  // Absolute URLs in the manifest, icons and social tags are resolved against
+  // this. Set APP_URL to the real origin in production.
+  metadataBase: new URL(process.env.APP_URL ?? 'http://localhost:3000'),
   title: {
     default: 'ExpenseX',
     template: '%s · ExpenseX',
@@ -32,12 +36,38 @@ export const metadata: Metadata = {
     'A financial operating system for one person or two — budgets, goals, spending and a shared workspace.',
   applicationName: 'ExpenseX',
   robots: { index: false, follow: false },
+
+  /* --- Installable app -------------------------------------------------- */
+  manifest: '/manifest.webmanifest',
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: '32x32' },
+      { url: '/icons/favicon-16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/icons/favicon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [{ url: '/icons/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+    shortcut: ['/favicon.ico'],
+  },
+  appleWebApp: {
+    capable: true,
+    title: 'ExpenseX',
+    // Translucent lets the app's own canvas colour run under the status bar,
+    // which is what `viewport-fit: cover` plus the safe-area padding expects.
+    statusBarStyle: 'black-translucent',
+  },
+  formatDetection: {
+    // Amounts and dates are not phone numbers; iOS otherwise turns figures in
+    // the ledger into blue tappable links.
+    telephone: false,
+  },
 };
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#adb3a1' },
-    { media: '(prefers-color-scheme: dark)', color: '#0e120d' },
+    { media: '(prefers-color-scheme: light)', color: '#f5f5f5' },
+    { media: '(prefers-color-scheme: dark)', color: '#090909' },
   ],
   width: 'device-width',
   initialScale: 1,
@@ -75,6 +105,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {/* The theme the user saved, applied once React takes over. */}
         {user ? <ThemeSync theme={user.theme} /> : null}
         <ToastProvider>{children}</ToastProvider>
+        <ServiceWorkerRegistrar />
       </body>
     </html>
   );

@@ -9,6 +9,7 @@ import { ThemeToggle } from './theme-toggle';
 import { isSharedRoute } from './navigation';
 import { WorkspaceSwitcher, type SwitcherWorkspace } from './workspace-switcher';
 import { signOut } from '@/server/actions/auth';
+import { clearServiceWorkerCaches } from '@/components/pwa/service-worker';
 import { Avatar, Badge } from '@/components/ui/primitives';
 import { Wordmark } from '@/components/brand';
 import { cn, firstName } from '@/lib/utils';
@@ -55,8 +56,10 @@ export function Header({
     <>
       {/* Keeps its canvas background at every width: the content panel scrolls
           underneath, and a transparent bar would let text collide with it. */}
-      <header className="ex-no-print sticky top-0 z-30 flex items-center gap-2 border-b border-line bg-canvas/95 px-4 py-2.5 backdrop-blur-sm sm:px-6 lg:border-0 lg:px-8 lg:py-4">
-        <Link href="/overview" className="lg:hidden">
+      {/* The height here is what --ex-header-h describes; changing the padding
+          or the control height means changing that token too. */}
+      <header className="ex-no-print sticky top-0 z-30 flex h-[var(--ex-header-h)] items-center gap-1.5 border-b border-line bg-canvas/95 px-3 backdrop-blur-sm sm:gap-2 sm:px-6 lg:border-0 lg:px-8">
+        <Link href="/overview" className="shrink-0 lg:hidden" aria-label="ExpenseX home">
           <Wordmark size="sm" />
         </Link>
 
@@ -78,7 +81,7 @@ export function Header({
         <button
           type="button"
           onClick={() => setSearchOpen(true)}
-          className="flex h-9 items-center gap-2 rounded-[7px] border border-line px-2.5 text-ink-3 transition-colors hover:border-line-strong hover:bg-surface-2 hover:text-ink lg:min-w-[13rem] lg:justify-start"
+          className="flex size-10 shrink-0 items-center justify-center gap-2 rounded-[7px] border border-line text-ink-3 transition-colors hover:border-line-strong hover:bg-surface-2 hover:text-ink lg:size-auto lg:h-9 lg:min-w-[13rem] lg:justify-start lg:px-2.5"
           aria-label="Search"
         >
           <svg width="15" height="15" viewBox="0 0 18 18" fill="none" aria-hidden="true" className="shrink-0">
@@ -92,6 +95,7 @@ export function Header({
         </button>
 
         <ThemeToggle compact />
+
         <NotificationBell notifications={notifications} unread={unread} />
         <AccountMenu user={user} />
       </header>
@@ -127,7 +131,7 @@ function AccountMenu({ user }: { user: { name: string; email: string } }) {
         aria-expanded={open}
         aria-haspopup="menu"
         aria-label="Account menu"
-        className="rounded-full transition-transform hover:scale-105"
+        className="grid size-10 shrink-0 place-items-center rounded-full transition-transform hover:scale-105 lg:size-9"
       >
         <Avatar name={user.name} size="sm" />
       </button>
@@ -157,6 +161,8 @@ function AccountMenu({ user }: { user: { name: string; email: string } }) {
             onClick={() =>
               startTransition(async () => {
                 await signOut();
+                // Build output only, but a shared device should keep none of it.
+                await clearServiceWorkerCaches();
                 router.refresh();
               })
             }

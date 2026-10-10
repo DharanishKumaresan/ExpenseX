@@ -81,8 +81,10 @@ export function RecurringManager({
   return (
     <>
       <div className="flex flex-col gap-8">
-        <div className="flex justify-end">
-          <Button onClick={openCreate}>
+        {/* Full width on a phone, where a lone right-aligned button reads as a
+            stray; back to a right-aligned action once there is room. */}
+        <div className="flex sm:justify-end">
+          <Button onClick={openCreate} className="w-full sm:w-auto">
             <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
               <path d="M6 1.5v9M1.5 6h9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
             </svg>
@@ -216,7 +218,7 @@ function RecurringRow({
         </p>
       </div>
 
-      <div className="flex w-full shrink-0 flex-wrap items-center gap-1.5 sm:w-auto">
+      <div className="flex w-full shrink-0 flex-wrap items-center gap-1.5 sm:ml-auto sm:w-auto">
         {item.active ? (
           <button
             type="button"
@@ -227,7 +229,7 @@ function RecurringRow({
                 'Payment recorded',
               )
             }
-            className="h-9 rounded-[7px] bg-forest px-3 font-mono text-[0.625rem] tracking-[0.12em] uppercase text-on-forest transition-colors hover:bg-forest-2 disabled:opacity-60"
+            className="h-11 rounded-[7px] bg-forest px-3.5 font-mono text-[0.625rem] tracking-[0.12em] uppercase text-on-forest transition-colors hover:bg-forest-2 disabled:opacity-60 lg:h-9 lg:px-3"
           >
             Record paid
           </button>
@@ -243,7 +245,7 @@ function RecurringRow({
               item.active ? 'Paused' : 'Resumed',
             )
           }
-          className="h-9 rounded-[7px] border border-line-strong px-3 font-mono text-[0.625rem] tracking-[0.12em] uppercase text-ink-2 transition-colors hover:bg-surface-2 disabled:opacity-60"
+          className="h-11 rounded-[7px] border border-line-strong px-3.5 font-mono text-[0.625rem] tracking-[0.12em] uppercase text-ink-2 transition-colors hover:bg-surface-2 disabled:opacity-60 lg:h-9 lg:px-3"
         >
           {item.active ? 'Pause' : 'Resume'}
         </button>
@@ -251,7 +253,7 @@ function RecurringRow({
         <button
           type="button"
           onClick={onEdit}
-          className="h-9 rounded-[7px] border border-line px-3 font-mono text-[0.625rem] tracking-[0.12em] uppercase text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink"
+          className="h-11 rounded-[7px] border border-line px-3.5 font-mono text-[0.625rem] tracking-[0.12em] uppercase text-ink-3 transition-colors hover:bg-surface-2 hover:text-ink lg:h-9 lg:px-3"
         >
           Edit
         </button>
@@ -260,7 +262,7 @@ function RecurringRow({
           type="button"
           onClick={() => setConfirmOpen(true)}
           aria-label={`Delete ${item.merchant}`}
-          className="grid size-9 place-items-center rounded-[7px] text-ink-3 transition-colors hover:bg-coral/10 hover:text-coral"
+          className="grid size-11 place-items-center rounded-[7px] text-ink-3 transition-colors hover:bg-coral/10 hover:text-coral lg:size-9"
         >
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 8.2h5.8l.6-8.2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />

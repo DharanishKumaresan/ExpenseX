@@ -6,10 +6,9 @@
    Every colour, radius, border and motion value in the product resolves to a
    token declared here. Components never hardcode a hex value.
 
-   The palette is a muted sage ground with deep olive typography, one yellow
-   accent for "allocate / plan" surfaces and one coral for "over budget"
-   warnings. Dark mode is a separately authored palette, not an inversion:
-   the olive identity, the yellow and the coral all survive the switch.
+   Neutral surfaces, black typography and tonal charts keep attention on
+   the numbers. Coral is reserved for warnings and destructive actions.
+   Dark mode uses black and charcoal with high-contrast neutral text.
    ========================================================================== */
 
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
@@ -18,35 +17,35 @@
   color-scheme: light;
 
   /* --- Ground & panels --------------------------------------------------- */
-  --ex-canvas: #adb3a1; /* app background, visible as gutters between panels */
-  --ex-surface: #c8ccba; /* primary panel */
-  --ex-surface-2: #d3d7c6; /* raised panel / hover */
-  --ex-surface-3: #dee1d2; /* input wells, table zebra */
-  --ex-surface-sunken: #a2a996;
+  --ex-canvas: #f5f5f5;
+  --ex-surface: #ffffff;
+  --ex-surface-2: #eeeeee;
+  --ex-surface-3: #f7f7f7;
+  --ex-surface-sunken: #e8e8e8;
 
   /* --- Dark olive blocks ------------------------------------------------- */
-  --ex-forest: #3d4739;
-  --ex-forest-2: #2c3429;
-  --ex-on-forest: #dfe3d3;
-  --ex-on-forest-muted: #9ba48f;
+  --ex-forest: #171717;
+  --ex-forest-2: #303030;
+  --ex-on-forest: #fafafa;
+  --ex-on-forest-muted: #b8b8b8;
 
   /* --- Typography -------------------------------------------------------- */
-  --ex-ink: #161c15; /* primary text */
-  --ex-ink-2: #333b2e; /* secondary text */
-  --ex-ink-3: #4a5243; /* muted text — holds 4.9:1 on --ex-surface */
-  --ex-ink-faint: #7a8372; /* decorative only: hatching, trailing decimals */
+  --ex-ink: #171717;
+  --ex-ink-2: #404040;
+  --ex-ink-3: #666666;
+  --ex-ink-faint: #858585;
 
   /* --- Accents ----------------------------------------------------------- */
-  --ex-accent: #e3ce4c; /* yellow: budgeting / allocation surfaces */
-  --ex-accent-strong: #d4bd35;
-  --ex-on-accent: #2a2708; /* 9.5:1 on --ex-accent */
+  --ex-accent: #dedede;
+  --ex-accent-strong: #cccccc;
+  --ex-on-accent: #171717;
 
   --ex-coral: #e56c4c; /* coral: overrun / destructive */
   --ex-coral-strong: #d4573a;
   --ex-on-coral: #23150f; /* 5.3:1 on --ex-coral */
 
-  --ex-positive: #46614a; /* income / gains — never the only signal */
-  --ex-on-positive: #e6ebdd;
+  --ex-positive: #404040;
+  --ex-on-positive: #ffffff;
 
   /* --- Lines ------------------------------------------------------------- */
   --ex-line: color-mix(in srgb, var(--ex-ink) 18%, transparent);
@@ -54,45 +53,62 @@
   --ex-line-faint: color-mix(in srgb, var(--ex-ink) 9%, transparent);
   --ex-line-on-forest: color-mix(in srgb, var(--ex-on-forest) 22%, transparent);
 
-  --ex-focus: #1d2a4d;
+  --ex-focus: #171717;
+
+  /* --- Layout metrics ----------------------------------------------------
+     The app header is sticky at every width, so anything else that sticks
+     (day dividers in the ledger, for instance) has to know exactly how tall
+     it is. Hard-coded guesses drift the moment the header's padding changes.
+     -------------------------------------------------------------------- */
+  --ex-header-h: 3.5625rem; /* 57px: 36px control + 2 x 10px padding + rule */
+  --ex-bottom-nav-h: 3.5rem;
+  --ex-fab-clearance: 8.5rem; /* bottom bar + FAB + breathing room */
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --ex-header-h: 4.25rem; /* 68px: 36px control + 2 x 16px padding */
+    --ex-bottom-nav-h: 0rem;
+    --ex-fab-clearance: 7rem;
+  }
 }
 
 [data-theme='dark'] {
   color-scheme: dark;
 
-  --ex-canvas: #0e120d;
-  --ex-surface: #161b14;
-  --ex-surface-2: #1e251b;
-  --ex-surface-3: #262e22;
-  --ex-surface-sunken: #0a0d09;
+  --ex-canvas: #090909;
+  --ex-surface: #141414;
+  --ex-surface-2: #222222;
+  --ex-surface-3: #1b1b1b;
+  --ex-surface-sunken: #050505;
 
-  --ex-forest: #2f3a2b;
-  --ex-forest-2: #3a4635;
-  --ex-on-forest: #dfe3d3;
-  --ex-on-forest-muted: #9ba48f;
+  --ex-forest: #292929;
+  --ex-forest-2: #383838;
+  --ex-on-forest: #fafafa;
+  --ex-on-forest-muted: #b8b8b8;
 
-  --ex-ink: #e2e7d6;
-  --ex-ink-2: #c2c9b4;
-  --ex-ink-3: #98a18b; /* 6.5:1 on --ex-surface */
-  --ex-ink-faint: #6e7767;
+  --ex-ink: #f5f5f5;
+  --ex-ink-2: #d4d4d4;
+  --ex-ink-3: #a3a3a3;
+  --ex-ink-faint: #808080;
 
-  --ex-accent: #e8d75e;
-  --ex-accent-strong: #f0e075;
-  --ex-on-accent: #22200a;
+  --ex-accent: #dedede;
+  --ex-accent-strong: #f5f5f5;
+  --ex-on-accent: #171717;
 
   --ex-coral: #f07e5e;
   --ex-coral-strong: #f79376;
   --ex-on-coral: #2b120a;
 
-  --ex-positive: #8fb894;
-  --ex-on-positive: #12200f;
+  --ex-positive: #d4d4d4;
+  --ex-on-positive: #171717;
 
   --ex-line: color-mix(in srgb, var(--ex-ink) 16%, transparent);
   --ex-line-strong: color-mix(in srgb, var(--ex-ink) 30%, transparent);
   --ex-line-faint: color-mix(in srgb, var(--ex-ink) 8%, transparent);
   --ex-line-on-forest: color-mix(in srgb, var(--ex-on-forest) 20%, transparent);
 
-  --ex-focus: #b9c8ff;
+  --ex-focus: #fafafa;
 }
 
 /* --------------------------------------------------------------------------
@@ -138,8 +154,8 @@
 
   --radius-block: 3px;
   --radius-tile: 10px;
-  --radius-panel: 22px;
-  --radius-shell: 30px;
+  --radius-panel: 14px;
+  --radius-shell: 18px;
 
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
@@ -196,6 +212,23 @@
     -moz-appearance: textfield;
   }
 
+  /* Safari on iOS zooms the viewport whenever a focused control's text is
+     under 16px, and then leaves it zoomed. Every control therefore renders at
+     16px on touch-primary devices and drops to its designed size on pointer
+     devices, where no such rule applies. */
+  @media (pointer: coarse) {
+    input,
+    select,
+    textarea {
+      font-size: max(16px, 1em);
+    }
+  }
+
+  /* Anchors and section targets must clear the sticky header. */
+  :target {
+    scroll-margin-top: calc(var(--ex-header-h) + 1rem);
+  }
+
   ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
@@ -215,18 +248,18 @@
 @layer components {
   /* Micro uppercase metadata label: TOTAL SPENT, AVAILABLE, PAID BY … */
   .ex-label {
-    font-family: var(--font-mono);
-    font-size: 0.625rem;
-    line-height: 1;
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    line-height: 1.4;
     font-weight: 500;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    text-transform: none;
     color: var(--ex-ink-3);
   }
 
   .ex-label-lg {
-    font-size: 0.6875rem;
-    letter-spacing: 0.18em;
+    font-size: 0.75rem;
+    letter-spacing: 0.02em;
   }
 
   /* Oversized financial figures. Tight, technical, tabular. */
@@ -300,6 +333,33 @@
   .ex-grid-dots {
     background-image: radial-gradient(currentColor 1px, transparent 1px);
     background-size: 5px 5px;
+  }
+
+  /* Sticks a sub-header directly beneath the app header at any breakpoint. */
+  .ex-sticky-under-header {
+    position: sticky;
+    top: var(--ex-header-h);
+  }
+
+  /* Horizontal rail that bleeds 4px past its container so focus rings are not
+     clipped, without widening the page: the extra width is given back. */
+  .ex-rail {
+    margin-inline: -0.25rem;
+    width: calc(100% + 0.5rem);
+    max-width: calc(100% + 0.5rem);
+    padding-inline: 0.25rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+  }
+  .ex-rail > * {
+    scroll-snap-align: start;
+  }
+
+  /* Horizontal safe-area padding for notched devices held in landscape. */
+  .ex-safe-x {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
   }
 }
 

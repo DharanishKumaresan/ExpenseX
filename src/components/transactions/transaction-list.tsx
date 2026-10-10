@@ -63,8 +63,9 @@ export function TransactionList({
         {groups.map((group) => (
           <section key={group.label ?? 'all'}>
             {group.label ? (
-              // Offsets clear the app header, which is sticky at both widths.
-              <div className="sticky top-[3.25rem] z-10 flex items-center gap-3 bg-surface/95 py-2 backdrop-blur-sm lg:top-[4.25rem]">
+              // Pinned to the exact header height rather than a guess at it,
+              // so no sliver of the previous day's rows shows above the label.
+              <div className="ex-sticky-under-header z-10 -mx-1 flex items-center gap-3 bg-surface/95 px-1 py-2 backdrop-blur-sm">
                 <span className="ex-label">{group.label}</span>
                 <span aria-hidden="true" className="h-px flex-1 bg-line" />
               </div>
@@ -78,7 +79,7 @@ export function TransactionList({
                     onClick={() => setSelected(transaction)}
                     className={cn(
                       'flex w-full items-center gap-3 border-b border-line-faint text-left transition-colors last:border-0 hover:bg-surface-2',
-                      compact ? 'py-2.5' : 'py-3',
+                      compact ? 'min-h-12 py-2.5' : 'min-h-14 py-3',
                     )}
                   >
                     <CategoryIcon

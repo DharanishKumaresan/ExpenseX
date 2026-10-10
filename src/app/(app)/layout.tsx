@@ -33,7 +33,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     : null;
 
   return (
-    <div className="flex min-h-dvh bg-canvas">
+    <div className="ex-safe-x flex min-h-dvh bg-canvas">
       <Sidebar
         workspace={switcherWorkspace}
         userName={user.name}
@@ -41,7 +41,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         pendingInvitations={invitations.length}
       />
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      {/* Header and content share one capped column, so on a very wide monitor
+          the search field and the panel's right edge still line up. */}
+      <div className="mx-auto flex w-full min-w-0 max-w-[1720px] flex-1 flex-col">
         <Header
           user={{ name: user.name, email: user.email, currency: user.currency }}
           workspace={switcherWorkspace}
@@ -51,10 +53,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
         <MobileWorkspaceBar workspace={switcherWorkspace} userName={user.name} />
 
-        {/* pb clears the mobile bottom bar and the floating add button. */}
+        {/* The bottom padding is driven by --ex-fab-clearance so the last row
+            of any page clears both the mobile tab bar and the floating add
+            button instead of disappearing underneath them. */}
         <main
           id="main"
-          className="min-w-0 flex-1 px-3 pt-3 pb-28 sm:px-6 lg:px-8 lg:pt-2 lg:pb-10"
+          className="min-w-0 flex-1 px-3 pt-3 pb-[var(--ex-fab-clearance)] sm:px-6 lg:px-8 lg:pt-2"
         >
           <div className="ex-panel min-h-full px-4 py-6 sm:px-7 sm:py-8 lg:px-10 lg:py-10">
             {children}
